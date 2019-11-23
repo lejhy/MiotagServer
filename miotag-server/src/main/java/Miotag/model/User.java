@@ -1,13 +1,9 @@
 package Miotag.model;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,7 +13,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue
     private long id;
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Authority> authorities;
     private boolean enabled;
     private boolean accountNonExpired;

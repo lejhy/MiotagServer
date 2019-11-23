@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
+@RequestMapping(value = "/user")
 public class UserController {
 
     private final UserService userService;
@@ -21,7 +23,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @PostMapping(path = "/register")
     public UserDto registerUser(@Valid UserDto userDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
@@ -40,8 +42,8 @@ public class UserController {
         }
     }
 
-    @GetMapping
-    public String postUser() {
-        return "Get User";
+    @GetMapping(path = "")
+    public String getUser(Principal principal) {
+        return principal.getName();
     }
 }
