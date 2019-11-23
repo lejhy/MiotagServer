@@ -26,11 +26,7 @@ public class UserController {
     @PostMapping(path = "/register")
     public UserDto registerUser(@Valid UserDto userDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            bindingResult.getFieldErrors().forEach(e ->
-                    errorMessage.append(e.getField()).append(": ").append(e.getDefaultMessage()).append("\n")
-            );
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, getValidationErrorMessage(bindingResult));
         }
         try {
             return userService.registerUser(userDto);
@@ -42,8 +38,33 @@ public class UserController {
         }
     }
 
-    @GetMapping(path = "")
-    public String getUser(Principal principal) {
-        return principal.getName();
+    @GetMapping
+    public UserDto getUser(Principal principal) {
+        return userService.getUserByEmail(principal.getName());
+    }
+
+    @PatchMapping
+    public UserDto updateUser(@Valid UserDto userDto, BindingResult bindingResult, Principal principal) {
+        if(bindingResult.hasErrors()) {
+            if (bindingResult.getFieldErrors().stream().anyMatch(error -> error.getRejectedValue() != null)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, getValidationErrorMessage(bindingResult));
+            }
+        }
+        try {
+            return userService.updateUser(userDto, principal.getName());
+        } catch (EmailExistsException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "User with email " + userDto.getEmail() + " already exists"
+            );
+        }
+    }
+
+    private String getValidationErrorMessage(BindingResult bindingResult) {
+        StringBuilder errorMessage = new StringBuilder();
+        bindingResult.getFieldErrors().forEach(e ->
+                errorMessage.append(e.getField()).append(": ").append(e.getDefaultMessage()).append("\n")
+        );
+        return errorMessage.toString();
     }
 }

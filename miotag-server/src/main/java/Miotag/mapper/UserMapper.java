@@ -2,8 +2,8 @@ package Miotag.mapper;
 
 import Miotag.dto.UserDto;
 import Miotag.model.User;
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,9 +13,13 @@ public class UserMapper {
     private ModelMapper modelMapper;
 
     @Autowired
-    public UserMapper(ModelMapper mapper) {
-        this.modelMapper = mapper;
-        modelMapper.addMappings(new UserPropertyMap());
+    public UserMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+        modelMapper.createTypeMap(UserDto.class, User.class)
+                .setPropertyCondition(Conditions.isNotNull())
+                .addMappings(mapper -> mapper.skip(User::setId));
+        modelMapper.createTypeMap(User.class, UserDto.class)
+                .addMappings(mapper -> mapper.skip(UserDto::setPassword));
     }
 
     public User map(UserDto userDto) {
@@ -26,9 +30,5 @@ public class UserMapper {
         return modelMapper.map(user, UserDto.class);
     }
 
-    class UserPropertyMap extends PropertyMap<User, UserDto> {
-        protected void configure() {
-            skip().setPassword(null);
-        }
-    }
+    public void map(UserDto userDto, User user) { modelMapper.map(userDto, user); }
 }
