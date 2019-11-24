@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class User implements UserDetails {
@@ -15,6 +16,10 @@ public class User implements UserDetails {
     private long id;
     @OneToMany(fetch = FetchType.EAGER)
     private List<Authority> authorities;
+    @ManyToMany
+    private Set<User> usersFollowed;
+    @ManyToMany(mappedBy = "usersFollowed")
+    private Set<User> followers;
     private boolean enabled;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
@@ -46,6 +51,31 @@ public class User implements UserDetails {
         this.authorities = authorities;
     }
 
+    public Set<User> getUsersFollowed() {
+        return usersFollowed;
+    }
+
+    public void setUsersFollowed(Set<User> usersFollowed) {
+        this.usersFollowed = usersFollowed;
+    }
+
+    public Set<User> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<User> followers) {
+        this.followers = followers;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return accountNonExpired;
@@ -71,15 +101,6 @@ public class User implements UserDetails {
 
     public void setCredentialsNonExpired(boolean credentialsNonExpired) {
         this.credentialsNonExpired = credentialsNonExpired;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     public String getFirstName() {

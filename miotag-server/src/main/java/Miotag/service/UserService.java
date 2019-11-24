@@ -2,18 +2,22 @@ package Miotag.service;
 
 import Miotag.dto.UserDto;
 import Miotag.exception.EmailExistsException;
+import Miotag.exception.UserNotFoundException;
 import Miotag.mapper.UserMapper;
 import Miotag.model.User;
 import Miotag.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.lang.reflect.Field;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService, UserDetailsService {
@@ -57,6 +61,22 @@ public class UserService implements IUserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return findUser(email);
+    }
+
+    public List<UserDto> getUsersFollowed(String email) {
+        return findUser(email).getUsersFollowed().stream().map(userMapper::map).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public boolean followUser(String email, UserDto userDto) {
+        User user = findUser(email);
+        if (user.getId() == userDto.getId()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User cannot follow itself");
+        }
+        User target = userRepository.findById(userDto.getId()).orElseThrow(() ->
+                new UserNotFoundException(userDto.getId())
+        );
+        return user.getUsersFollowed().add(target);
     }
 
     private User findUser(String email) {
