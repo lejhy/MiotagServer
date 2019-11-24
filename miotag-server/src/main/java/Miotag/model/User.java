@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
+@Table(indexes = @Index(columnList = "email", unique = true))
 public class User implements UserDetails {
 
     @Id
