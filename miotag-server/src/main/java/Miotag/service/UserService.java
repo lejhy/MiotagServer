@@ -8,9 +8,6 @@ import Miotag.model.User;
 import Miotag.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,17 +17,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService implements IUserService, UserDetailsService {
+public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ISecurityService securityService;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, ISecurityService securityService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.securityService = securityService;
     }
 
     @Override
@@ -44,13 +43,13 @@ public class UserService implements IUserService, UserDetailsService {
 
     @Override
     public UserDto getUserByEmail(String email) {
-        return userMapper.map(findUser(email));
+        return userMapper.map(securityService.findUser(email));
     }
 
     @Override
     @Transactional
     public UserDto updateUser(UserDto userDto, String email) {
-        User user = findUser(email);
+        User user = securityService.findUser(email);
         if (!email.equals(user.getEmail()) && emailExist(userDto.getEmail())) {
             throw new EmailExistsException(email);
         }
@@ -59,17 +58,14 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return findUser(email);
-    }
-
     public List<UserDto> getUsersFollowed(String email) {
-        return findUser(email).getUsersFollowed().stream().map(userMapper::map).collect(Collectors.toList());
+        return securityService.findUser(email).getUsersFollowed().stream().map(userMapper::map).collect(Collectors.toList());
     }
 
+    @Override
     @Transactional
     public boolean followUser(String email, UserDto userDto) {
-        User user = findUser(email);
+        User user = securityService.findUser(email);
         if (user.getId() == userDto.getId()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User cannot follow itself");
         }
@@ -77,12 +73,6 @@ public class UserService implements IUserService, UserDetailsService {
                 new UserNotFoundException(userDto.getId())
         );
         return user.getUsersFollowed().add(target);
-    }
-
-    private User findUser(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException("No user found with username " + email)
-        );
     }
 
     private boolean emailExist(String email) {

@@ -2,6 +2,7 @@ package Miotag.controller;
 
 import Miotag.dto.UserDto;
 import Miotag.exception.ValidationErrorException;
+import Miotag.service.IUserService;
 import Miotag.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -14,7 +15,7 @@ import java.security.Principal;
 @RequestMapping(value = "/user")
 public class UserController {
 
-    private final UserService userService;
+    private final IUserService userService;
 
     @Autowired
     public UserController(UserService userService) {

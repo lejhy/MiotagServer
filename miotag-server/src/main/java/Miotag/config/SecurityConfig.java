@@ -1,6 +1,6 @@
 package Miotag.config;
 
-import Miotag.service.UserService;
+import Miotag.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,12 +17,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
+    private final SecurityService securityService;
 
     @Autowired
-    public SecurityConfig(PasswordEncoder passwordEncoder, UserService userService) {
+    public SecurityConfig(PasswordEncoder passwordEncoder, SecurityService securityService) {
         this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
+        this.securityService = securityService;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService);
+        authProvider.setUserDetailsService(securityService);
         authProvider.setPasswordEncoder(passwordEncoder);
         auth.authenticationProvider(authProvider);
     }
