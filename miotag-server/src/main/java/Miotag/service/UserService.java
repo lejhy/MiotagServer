@@ -36,7 +36,7 @@ public class UserService implements IUserService, UserDetailsService {
     @Override
     public UserDto registerUser(UserDto userDto) throws EmailExistsException {
         if (emailExist(userDto.getEmail())) {
-            throw new EmailExistsException();
+            throw new EmailExistsException(userDto.getEmail());
         }
         User user = prepareNewUser(userDto);
         return userMapper.map(userRepository.save(user));
@@ -50,9 +50,9 @@ public class UserService implements IUserService, UserDetailsService {
     @Override
     @Transactional
     public UserDto updateUser(UserDto userDto, String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(RuntimeException::new);
+        User user = findUser(email);
         if (!email.equals(user.getEmail()) && emailExist(userDto.getEmail())) {
-            throw new EmailExistsException();
+            throw new EmailExistsException(email);
         }
         userMapper.map(userDto, user);
         return userMapper.map(user);
