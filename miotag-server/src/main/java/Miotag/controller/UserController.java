@@ -22,7 +22,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(path = "/register")
+    @PostMapping
     public UserDto registerUser(@RequestBody @Valid UserDto userDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationErrorException(bindingResult);
