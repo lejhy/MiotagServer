@@ -4,10 +4,7 @@ import Miotag.dto.UserDto;
 import Miotag.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
@@ -30,7 +27,7 @@ public class RelationController {
     }
 
     @PostMapping
-    public boolean follow(UserDto userDto, Principal principal) {
+    public boolean follow(@RequestBody UserDto userDto, Principal principal) {
         if (userDto.getId() == 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please provide the target user id");
         }

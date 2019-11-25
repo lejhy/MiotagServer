@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/register")
-    public UserDto registerUser(@Valid UserDto userDto, BindingResult bindingResult) {
+    public UserDto registerUser(@RequestBody @Valid UserDto userDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationErrorException(bindingResult);
         }
@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PatchMapping
-    public UserDto updateUser(@Valid UserDto userDto, BindingResult bindingResult, Principal principal) {
+    public UserDto updateUser(@RequestBody @Valid UserDto userDto, BindingResult bindingResult, Principal principal) {
         if(bindingResult.hasErrors()) {
             if (bindingResult.getFieldErrors().stream().anyMatch(error -> error.getRejectedValue() != null)) {
                 throw new ValidationErrorException(bindingResult);
