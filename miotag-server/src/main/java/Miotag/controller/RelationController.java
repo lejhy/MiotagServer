@@ -33,4 +33,12 @@ public class RelationController {
         }
         return userService.followUser(principal.getName(), userDto);
     }
+
+    @DeleteMapping
+    public boolean unfollow(@RequestBody UserDto userDto, Principal principal) {
+        if (userDto.getId() == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please provide the target user id");
+        }
+        return userService.unfollowUser(principal.getName(), userDto);
+    }
 }

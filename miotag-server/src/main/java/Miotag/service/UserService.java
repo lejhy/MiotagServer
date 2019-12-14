@@ -8,7 +8,6 @@ import Miotag.model.User;
 import Miotag.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,14 +20,12 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
     private final ISecurityService securityService;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, ISecurityService securityService) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, ISecurityService securityService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
         this.securityService = securityService;
     }
 
@@ -86,7 +83,6 @@ public class UserService implements IUserService {
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return user;
     }
 }
