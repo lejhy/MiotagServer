@@ -13,4 +13,5 @@ public interface IUserService {
     UserDto updateUser(UserDto userDto, String email);
     List<UserDto> getUsersFollowed(String email);
     boolean followUser(String email, UserDto userDto);
+    boolean unfollowUser(String email, UserDto userDto);
 }

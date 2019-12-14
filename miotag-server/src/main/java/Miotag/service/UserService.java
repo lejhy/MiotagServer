@@ -72,6 +72,19 @@ public class UserService implements IUserService {
         return user.getUsersFollowed().add(target);
     }
 
+    @Override
+    @Transactional
+    public boolean unfollowUser(String email, UserDto userDto) {
+        User user = securityService.findUser(email);
+        if (user.getId() == userDto.getId()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User cannot unfollow itself");
+        }
+        User target = userRepository.findById(userDto.getId()).orElseThrow(() ->
+                new UserNotFoundException(userDto.getId())
+        );
+        return user.getUsersFollowed().remove(target);
+    }
+
     private boolean emailExist(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
