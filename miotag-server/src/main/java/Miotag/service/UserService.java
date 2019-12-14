@@ -44,6 +44,9 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public boolean userExists(long id) {return userRepository.existsById(id); }
+
+    @Override
     @Transactional
     public UserDto updateUser(UserDto userDto, String email) {
         User user = securityService.findUser(email);

@@ -19,15 +19,15 @@ import java.util.stream.Collectors;
 public class MessageService implements IMessageService {
 
     private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
+    private final IUserService userService;
     private final MessageMapper messageMapper;
     private final ISecurityService securityService;
 
 
     @Autowired
-    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageMapper messageMapper, ISecurityService securityService) {
+    public MessageService(MessageRepository messageRepository, IUserService userService, MessageMapper messageMapper, ISecurityService securityService) {
         this.messageRepository = messageRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.messageMapper = messageMapper;
         this.securityService = securityService;
     }
@@ -42,7 +42,7 @@ public class MessageService implements IMessageService {
     @Override
     public MessageDto sendMessage(MessageDto messageDto, String email) {
         long recipientId = messageDto.getTo().getId();
-        if(!userRepository.existsById(recipientId)) {
+        if(!userService.userExists(recipientId)) {
             throw new UserNotFoundException(recipientId);
         }
         Message message = prepareNewMessage(messageDto, email);
