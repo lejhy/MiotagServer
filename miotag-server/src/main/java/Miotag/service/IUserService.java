@@ -1,10 +1,7 @@
 package Miotag.service;
 
 import Miotag.dto.UserDto;
-import Miotag.model.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 public interface IUserService {

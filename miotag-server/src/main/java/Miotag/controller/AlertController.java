@@ -2,7 +2,6 @@ package Miotag.controller;
 
 import Miotag.dto.AlertDto;
 import Miotag.exception.ValidationErrorException;
-import Miotag.model.Alert;
 import Miotag.service.IAlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -24,7 +23,7 @@ public class AlertController {
     }
 
     @GetMapping
-    public List<Alert> getAlerts(Principal principal) {
+    public List<AlertDto> getAlerts(Principal principal) {
         return alertService.getAlerts(principal.getName());
     }
 

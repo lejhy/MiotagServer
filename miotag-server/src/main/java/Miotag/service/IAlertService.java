@@ -6,7 +6,7 @@ import Miotag.model.Alert;
 import java.util.List;
 
 public interface IAlertService {
-    List<Alert> getAlerts(String name);
     Alert newAlert(Alert alert);
+    List<AlertDto> getAlerts(String name);
     boolean deleteAlert(String name, AlertDto alertDto);
 }
