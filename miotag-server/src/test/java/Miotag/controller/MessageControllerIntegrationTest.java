@@ -68,8 +68,8 @@ public class MessageControllerIntegrationTest {
 
         assertEquals(sender.getId(), messageReceived.getFrom().getId());
         assertEquals(receiver.getId(), messageReceived.getTo().getId());
-        assertTrue(timestampBefore.before(messageReceived.getDate()));
-        assertTrue(timestampAfter.after(messageReceived.getDate()));
+        assertTrue(timestampBefore.compareTo(messageReceived.getDate()) <= 0);
+        assertTrue(timestampAfter.compareTo(messageReceived.getDate()) >= 0);
         assertEquals(messageToSend.getSubject(), messageReceived.getSubject());
         assertEquals(messageToSend.getContent(), messageReceived.getContent());
     }

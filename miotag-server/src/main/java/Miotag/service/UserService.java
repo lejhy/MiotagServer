@@ -53,6 +53,8 @@ public class UserService implements IUserService {
         if (!email.equals(user.getEmail()) && emailExist(userDto.getEmail())) {
             throw new EmailExistsException(email);
         }
+
+        userDto.setId(user.getId());
         userMapper.map(userDto, user);
         return userMapper.map(user);
     }

@@ -12,7 +12,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/alert")
+@RequestMapping("/alerts")
 public class AlertController {
 
     private final IAlertService alertService;
