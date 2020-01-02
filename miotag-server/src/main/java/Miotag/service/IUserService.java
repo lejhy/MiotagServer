@@ -1,17 +1,18 @@
 package Miotag.service;
 
 import Miotag.dto.UserDto;
+import Miotag.model.User;
 
 import java.util.List;
 
 public interface IUserService {
     UserDto registerUser(UserDto userDto);
-    UserDto getUserByEmail(String email);
+    UserDto getUser(User user);
 
     boolean userExists(long id);
 
-    UserDto updateUser(UserDto userDto, String email);
-    List<UserDto> getUsersFollowed(String email);
-    boolean followUser(String email, UserDto userDto);
-    boolean unfollowUser(String email, UserDto userDto);
+    UserDto updateUser(User user, UserDto userDto);
+    List<UserDto> getUsersFollowed(User user);
+    boolean followUser(User user, UserDto userDto);
+    boolean unfollowUser(User user, UserDto userDto);
 }

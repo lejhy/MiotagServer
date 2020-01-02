@@ -20,13 +20,11 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final ISecurityService securityService;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper, ISecurityService securityService) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
-        this.securityService = securityService;
     }
 
     @Override
@@ -39,8 +37,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDto getUserByEmail(String email) {
-        return userMapper.map(securityService.findUser(email));
+    public UserDto getUser(User user) {
+        return userMapper.map(user);
     }
 
     @Override
@@ -48,10 +46,10 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
-    public UserDto updateUser(UserDto userDto, String email) {
-        User user = securityService.findUser(email);
-        if (!email.equals(user.getEmail()) && emailExist(userDto.getEmail())) {
-            throw new EmailExistsException(email);
+    public UserDto updateUser(User user, UserDto userDto) {
+        user = getAtachedUserEntity(user);
+        if (!user.getEmail().equals(userDto.getEmail()) && emailExist(userDto.getEmail())) {
+            throw new EmailExistsException(user.getEmail());
         }
 
         userDto.setId(user.getId());
@@ -60,14 +58,14 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<UserDto> getUsersFollowed(String email) {
-        return securityService.findUser(email).getUsersFollowed().stream().map(userMapper::map).collect(Collectors.toList());
+    public List<UserDto> getUsersFollowed(User user) {
+        return getAtachedUserEntity(user).getUsersFollowed().stream().map(userMapper::map).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public boolean followUser(String email, UserDto userDto) {
-        User user = securityService.findUser(email);
+    public boolean followUser(User user, UserDto userDto) {
+        user = getAtachedUserEntity(user);
         if (user.getId() == userDto.getId()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User cannot follow itself");
         }
@@ -79,8 +77,8 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
-    public boolean unfollowUser(String email, UserDto userDto) {
-        User user = securityService.findUser(email);
+    public boolean unfollowUser(User user, UserDto userDto) {
+        user = getAtachedUserEntity(user);
         if (user.getId() == userDto.getId()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User cannot unfollow itself");
         }
@@ -88,6 +86,11 @@ public class UserService implements IUserService {
                 new UserNotFoundException(userDto.getId())
         );
         return user.getUsersFollowed().remove(target);
+    }
+
+    private User getAtachedUserEntity(User user) {
+        long userId = user.getId();
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     private boolean emailExist(String email) {

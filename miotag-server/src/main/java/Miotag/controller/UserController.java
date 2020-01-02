@@ -2,9 +2,11 @@ package Miotag.controller;
 
 import Miotag.dto.UserDto;
 import Miotag.exception.ValidationErrorException;
+import Miotag.model.User;
 import Miotag.service.IUserService;
 import Miotag.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,17 +33,17 @@ public class UserController {
     }
 
     @GetMapping
-    public UserDto getUser(Principal principal) {
-        return userService.getUserByEmail(principal.getName());
+    public UserDto getUser(@AuthenticationPrincipal User user) {
+        return userService.getUser(user);
     }
 
     @PatchMapping
-    public UserDto updateUser(@RequestBody @Valid UserDto userDto, BindingResult bindingResult, Principal principal) {
+    public UserDto updateUser(@RequestBody @Valid UserDto userDto, BindingResult bindingResult, @AuthenticationPrincipal User user) {
         if(bindingResult.hasErrors()) {
             if (bindingResult.getFieldErrors().stream().anyMatch(error -> error.getRejectedValue() != null)) {
                 throw new ValidationErrorException(bindingResult);
             }
         }
-        return userService.updateUser(userDto, principal.getName());
+        return userService.updateUser(user, userDto);
     }
 }

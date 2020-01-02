@@ -1,6 +1,8 @@
 package Miotag.service;
 
 import Miotag.dto.AlertDto;
+import Miotag.exception.AccessViolationException;
+import Miotag.exception.AlertNotFoundException;
 import Miotag.mapper.AlertMapper;
 import Miotag.model.Alert;
 import Miotag.model.User;
@@ -16,19 +18,16 @@ import java.util.stream.Collectors;
 public class AlertService implements IAlertService {
 
     private final AlertRepository alertRepository;
-    private final ISecurityService securityService;
     private final AlertMapper alertMapper;
 
     @Autowired
-    public AlertService(AlertRepository alertRepository, ISecurityService securityService, AlertMapper alertMapper) {
+    public AlertService(AlertRepository alertRepository, AlertMapper alertMapper) {
         this.alertRepository = alertRepository;
-        this.securityService = securityService;
         this.alertMapper = alertMapper;
     }
 
     @Override
-    public List<AlertDto> getAlerts(String name) {
-        User user = securityService.findUser(name);
+    public List<AlertDto> getAlerts(User user) {
         List<Alert> alerts = alertRepository.findAllByUser(user);
         return alerts.stream().map(alertMapper::map).collect(Collectors.toList());
     }
@@ -41,13 +40,14 @@ public class AlertService implements IAlertService {
     }
 
     @Override
-    public boolean deleteAlert(String name, AlertDto alertDto) {
-        securityService.findUser(name);
-        if (alertRepository.existsById(alertDto.getId())) {
-            alertRepository.deleteById(alertDto.getId());
-            return true;
-        } else {
-            return false;
+    public boolean deleteAlert(User user, AlertDto alertDto) {
+        Alert alertInDb = alertRepository.findById(alertDto.getId()).orElseThrow(() ->
+                new AlertNotFoundException(alertDto.getId())
+        );
+        if (user.getId() != alertInDb.getId()) {
+            throw new AccessViolationException();
         }
+        alertRepository.deleteById(alertDto.getId());
+        return true;
     }
 }
