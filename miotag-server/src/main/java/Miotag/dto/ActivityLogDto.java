@@ -1,12 +1,12 @@
 package Miotag.dto;
 
-import Miotag.model.Activity;
-
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class ActivityLogDto {
     private long id;
     private Date date;
+    @NotNull
     private ActivityDto activity;
     private int length;
     private int score;

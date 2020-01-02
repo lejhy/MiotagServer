@@ -2,6 +2,7 @@ package Miotag.controller;
 
 import Miotag.dto.ActivityDto;
 import Miotag.dto.ActivityLogDto;
+import Miotag.exception.ValidationErrorException;
 import Miotag.model.Activity;
 import Miotag.model.User;
 import Miotag.service.IActivityService;
@@ -29,7 +30,10 @@ public class ActivityController {
 
     @PostMapping("/logs")
     public ActivityLogDto newActivityLog(@RequestBody @Valid ActivityLogDto activityLogDto, BindingResult bindingResult, @AuthenticationPrincipal User user) {
-        return activityService.newActivityLog(activityLogDto, user); //TODO binding check
+        if (bindingResult.hasErrors()) {
+            throw new ValidationErrorException(bindingResult);
+        }
+        return activityService.newActivityLog(activityLogDto, user);
     }
 
     @GetMapping("/logs")
