@@ -1,9 +1,6 @@
 package Miotag.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -11,7 +8,7 @@ public class Alert {
     @Id
     @GeneratedValue
     private long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
     private Date date;
     private String message;
