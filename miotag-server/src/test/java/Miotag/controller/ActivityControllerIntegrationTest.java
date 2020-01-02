@@ -30,6 +30,7 @@ import static Miotag.controller.Utils.generateUserDto;
 import static Miotag.controller.Utils.registerUser;
 import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,17 +61,18 @@ public class ActivityControllerIntegrationTest {
 
     private Random random = new Random();
 
-    private Activity activity;
+    private UserDto userUnderTest;
+    private ActivityDto activityDto;
 
     @Before
     public  void setUp() throws Exception {
-        activity = activityRepository.save(generateActivity());
+        activityDto = activityMapper.map(activityRepository.save(generateActivity()));
+        userUnderTest = generateUserDto();
+        userUnderTest.setId(registerUser(mockMvc, objectMapper, userUnderTest).getId());
     }
 
     @Test
     public void getActivities() throws Exception {
-        UserDto userUnderTest = generateUserDto();
-        userUnderTest.setId(registerUser(mockMvc, objectMapper, userUnderTest).getId());
         List<Activity> activities = new ArrayList<>();
         for(int i = 0; i < 8; i++) {
             activities.add(activityRepository.save(generateActivity()));
@@ -102,10 +104,6 @@ public class ActivityControllerIntegrationTest {
 
     @Test
     public void newAndGetActivityLog() throws Exception {
-        UserDto userUnderTest = generateUserDto();
-        userUnderTest.setId(registerUser(mockMvc, objectMapper, userUnderTest).getId());
-
-        ActivityDto activityDto = activityMapper.map(activity);
         ActivityLogDto activityLogToSend = generateActivityLogDto(activityDto);
         Date timestampBefore = new Date();
         ActivityLogDto activityLogSent = postActivityLog(userUnderTest, activityLogToSend);
@@ -126,10 +124,6 @@ public class ActivityControllerIntegrationTest {
 
     @Test
     public void newAndGetActivityLogMultiple() throws Exception {
-        UserDto userUnderTest = generateUserDto();
-        userUnderTest.setId(registerUser(mockMvc, objectMapper, userUnderTest).getId());
-        ActivityDto activityDto = activityMapper.map(activity);
-
         List<ActivityLogDto> activityLogsSent = new ArrayList<>();
 
         for(int i = 0; i < 5; i++) {
@@ -151,8 +145,22 @@ public class ActivityControllerIntegrationTest {
     }
 
     @Test
-    public void getActivityLogEmpty() {
+    public void getActivityLogEmpty() throws Exception {
+        List<ActivityLogDto> activityLogsReceived = getActivityLog(userUnderTest, activityDto);
 
+        assertEquals(0, activityLogsReceived.size());
+    }
+
+    @Test
+    public void newActivityLog4xx() throws Exception {
+        ActivityLogDto activityLogDto = generateActivityLogDto(activityDto);
+        activityLogDto.getActivity().setId(9999);
+
+        mockMvc.perform(post("/activities/logs")
+                .with(httpBasic(userUnderTest.getEmail(), userUnderTest.getPassword()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(activityLogDto))
+        ).andExpect(status().isBadRequest());
     }
 
     private ActivityLogDto postActivityLog(UserDto userDto, ActivityLogDto activityLogDto) throws Exception {
