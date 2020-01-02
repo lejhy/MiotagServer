@@ -51,10 +51,6 @@ public class AlertControllerIntegrationTest {
 
     private Random random = new Random();
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
     @Test
     public void getAlerts() throws Exception {
         UserDto userDto = generateUserDto();

@@ -45,11 +45,6 @@ public class MessageControllerIntegrationTest {
 
     private Random random = new Random();
 
-    @Before
-    public void setUp() {
-
-    }
-
     @Test
     public void sendSingle() throws Exception {
         UserDto sender = generateUserDto();

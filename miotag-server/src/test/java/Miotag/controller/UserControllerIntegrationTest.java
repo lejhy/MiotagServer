@@ -33,10 +33,6 @@ public class UserControllerIntegrationTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Before
-    public void setUp() {
-    }
-
     @Test
     public void registerUser() throws Exception{
         UserDto userDto = generateUserDto();

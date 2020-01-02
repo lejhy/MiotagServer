@@ -4,6 +4,7 @@ import Miotag.dto.UserDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +42,12 @@ public class RelationControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     private final int N_USERS = 8;
-    private UserDto users[] = new UserDto[N_USERS];
+    private UserDto users[];
 
     @Before
     public void setUp() throws Exception {
-        for(int i = 0; i < N_USERS; i++) {
+        users = new UserDto[N_USERS];
+        for (int i = 0; i < N_USERS; i++) {
             UserDto user = generateUserDto();
             UserDto responseUser = registerUser(mockMvc, objectMapper, user);
             user.setId(responseUser.getId());
@@ -73,8 +75,8 @@ public class RelationControllerIntegrationTest {
 
     @Test
     public void followSingle() throws Exception{
-        UserDto user = users[1];
-        UserDto target = users[0];
+        UserDto user = users[0];
+        UserDto target = users[1];
 
         postRelations(user, target, true);
         postRelations(user, target, false);
@@ -87,8 +89,8 @@ public class RelationControllerIntegrationTest {
 
     @Test
     public void followUnfollow() throws Exception{
-        UserDto user = users[2];
-        UserDto target = users[0];
+        UserDto user = users[0];
+        UserDto target = users[1];
 
         postRelations(user, target, true);
         deleteRelations(user, target, true);
