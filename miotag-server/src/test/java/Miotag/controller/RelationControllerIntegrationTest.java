@@ -1,6 +1,8 @@
 package Miotag.controller;
 
+import Miotag.dto.AlertDto;
 import Miotag.dto.UserDto;
+import Miotag.model.Alert;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -20,6 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.*;
 
 import static Miotag.controller.Utils.generateUserDto;
+import static Miotag.controller.Utils.getAlerts;
 import static Miotag.controller.Utils.registerUser;
 import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -85,6 +88,11 @@ public class RelationControllerIntegrationTest {
 
         assertEquals(relations.size(), 1);
         assertEquals(relations.get(0).getId(), target.getId());
+
+        List<AlertDto> targetUserAlerts = getAlerts(mockMvc, objectMapper, target);
+
+        assertEquals(1, targetUserAlerts.size());
+        assertEquals("User "+user.getEmail()+" started following you.", targetUserAlerts.get(0).getMessage());
     }
 
     @Test
