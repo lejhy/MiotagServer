@@ -4,6 +4,7 @@ import Miotag.dto.UserDto;
 import Miotag.exception.EmailExistsException;
 import Miotag.exception.UserNotFoundException;
 import Miotag.mapper.UserMapper;
+import Miotag.model.Alert;
 import Miotag.model.User;
 import Miotag.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,13 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final AlertService alertService;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, AlertService alertService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.alertService = alertService;
     }
 
     @Override
@@ -72,7 +75,15 @@ public class UserService implements IUserService {
         User target = userRepository.findById(userDto.getId()).orElseThrow(() ->
                 new UserNotFoundException(userDto.getId())
         );
-        return user.getUsersFollowed().add(target);
+        if(user.getUsersFollowed().add(target)) {
+            Alert alert = new Alert();
+            alert.setUser(target);
+            alert.setMessage("User "+user.getUsername()+" started following you.");
+            alertService.newAlert(alert);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
