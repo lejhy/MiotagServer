@@ -9,12 +9,8 @@ public class UserDto {
 
     private long id;
 
-    @NotNull
-    @NotEmpty
     private String firstName;
 
-    @NotNull
-    @NotEmpty
     private String lastName;
 
     @NotNull
