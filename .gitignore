@@ -1,0 +1,6 @@
+miotag-server/.idea
+miotag-server/target
+miotag-server/data.mv.db
+miotag-server/data.trace.db
+miotag-server/miotag-server.iml
+.DS_Store
