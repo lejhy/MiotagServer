@@ -74,6 +74,29 @@ public class UserControllerIntegrationTest {
     }
 
     @Test
+    public void getUserById() throws Exception{
+        UserDto userDto = generateUserDto();
+        registerUser(userDto);
+
+        UserDto privateUser = generateUserDto();
+        privateUser.setPrivate(true);
+        UserDto postResponseUserDto = registerUser(privateUser);
+
+        MvcResult getResult = mockMvc.perform(get("/users/" + postResponseUserDto.getId())
+                .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
+        ).andExpect(status().isOk()).andReturn();
+        String getResponse = getResult.getResponse().getContentAsString();
+        UserDto getResponseUserDto = objectMapper.readValue(getResponse, UserDto.class);
+
+        assertEquals(postResponseUserDto.getId(), getResponseUserDto.getId());
+        assertTrue(getResponseUserDto.isPrivate());
+        assertNull(getResponseUserDto.getEmail());
+        assertNull(getResponseUserDto.getFirstName());
+        assertNull(getResponseUserDto.getLastName());
+        assertNull(getResponseUserDto.getPassword());
+    }
+
+    @Test
     public void getUsers() throws Exception{
         List<UserDto> users = new ArrayList<>();
         List<UserDto> expectedUsers = new ArrayList<>();

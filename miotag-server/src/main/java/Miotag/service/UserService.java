@@ -45,6 +45,17 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public UserDto getUser(long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        if (user.isPrivate()) {
+            user = new User();
+            user.setId(id);
+            user.setPrivate(true);
+        }
+        return userMapper.map(user);
+    }
+
+    @Override
     public List<UserDto> getUsers(String query) {
         List<User> users = userRepository.findAllByEmailContainingOrFirstNameContainingOrLastNameContaining(query, query, query);
         users = users.stream().filter(user -> !user.isPrivate()).collect(Collectors.toList());

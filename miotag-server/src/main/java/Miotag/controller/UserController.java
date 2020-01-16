@@ -47,6 +47,11 @@ public class UserController {
         return userService.updateUser(user, userDto);
     }
 
+    @GetMapping("/{id}")
+    public UserDto getUser(@PathVariable("id") long id) {
+        return userService.getUser(id);
+    }
+
     @GetMapping(params = "q")
     public List<UserDto> queryUsers(@RequestParam(name = "q") String query) {
         return userService.getUsers(query);

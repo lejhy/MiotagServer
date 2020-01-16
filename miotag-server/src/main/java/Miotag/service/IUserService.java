@@ -9,6 +9,8 @@ public interface IUserService {
     UserDto registerUser(UserDto userDto);
     UserDto getUser(User user);
 
+    UserDto getUser(long id);
+
     List<UserDto> getUsers(String query);
 
     boolean userExists(long id);
