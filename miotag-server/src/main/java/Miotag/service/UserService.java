@@ -41,7 +41,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserDto getUser(User user) {
-        return userMapper.map(user);
+        return userMapper.map(getAtachedUserEntity(user));
     }
 
     @Override
