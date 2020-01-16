@@ -9,6 +9,8 @@ public class UserDto {
 
     private long id;
 
+    private boolean isTherapist;
+
     private String firstName;
 
     private String lastName;
@@ -28,6 +30,14 @@ public class UserDto {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public boolean isTherapist() {
+        return isTherapist;
+    }
+
+    public void setTherapist(boolean therapist) {
+        isTherapist = therapist;
     }
 
     public String getFirstName() {

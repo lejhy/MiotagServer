@@ -25,6 +25,7 @@ public class User implements UserDetails {
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
+    private boolean isTherapist;
     private String firstName;
     private String lastName;
     private String email;
@@ -102,6 +103,14 @@ public class User implements UserDetails {
 
     public void setCredentialsNonExpired(boolean credentialsNonExpired) {
         this.credentialsNonExpired = credentialsNonExpired;
+    }
+
+    public boolean isTherapist() {
+        return isTherapist;
+    }
+
+    public void setTherapist(boolean therapist) {
+        isTherapist = therapist;
     }
 
     public String getFirstName() {
