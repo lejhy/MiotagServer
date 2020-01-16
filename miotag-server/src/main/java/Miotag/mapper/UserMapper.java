@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 @Component
 public class UserMapper {
 
@@ -24,7 +22,7 @@ public class UserMapper {
         Converter<String, String> encode = ctx -> passwordEncoder.encode(ctx.getSource());
         modelMapper.createTypeMap(UserDto.class, User.class)
                 .setPropertyCondition(Conditions.isNotNull())
-                .addMappings(mapper -> mapper.when(Objects::nonNull).using(encode).map(UserDto::getPassword, User::setPassword));
+                .addMappings(mapper -> mapper.using(encode).map(UserDto::getPassword, User::setPassword));
         modelMapper.createTypeMap(User.class, UserDto.class)
                 .addMappings(mapper -> mapper.skip(UserDto::setPassword));
     }
