@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @GetMapping(params = "q")
-    public List<UserDto> queryUsers(@RequestParam(name = "q") String query) {
+    public List<UserDto> queryUsers(@RequestParam("q") String query) {
         return userService.getUsers(query);
     }
 }
