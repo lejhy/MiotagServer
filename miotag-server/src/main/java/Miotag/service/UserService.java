@@ -45,6 +45,12 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public List<UserDto> getUsers(String query) {
+        List<User> users = userRepository.findAllByEmailContainingOrFirstNameContainingOrLastNameContaining(query, query, query);
+        return users.stream().map(userMapper::map).collect(Collectors.toList());
+    }
+
+    @Override
     public boolean userExists(long id) {return userRepository.existsById(id); }
 
     @Override

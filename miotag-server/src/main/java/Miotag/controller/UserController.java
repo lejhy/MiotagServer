@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -44,5 +45,10 @@ public class UserController {
             }
         }
         return userService.updateUser(user, userDto);
+    }
+
+    @GetMapping(params = "q")
+    public List<UserDto> queryUsers(@RequestParam(name = "q") String query) {
+        return userService.getUsers(query);
     }
 }

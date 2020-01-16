@@ -1,8 +1,8 @@
 package Miotag.controller;
 
 import Miotag.dto.UserDto;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static Miotag.controller.Utils.generateUserDto;
 import static org.junit.Assert.*;
@@ -66,6 +70,40 @@ public class UserControllerIntegrationTest {
         assertEquals(postResponseUserDto.getFirstName(), getResponseUserDto.getFirstName());
         assertEquals(postResponseUserDto.getLastName(), getResponseUserDto.getLastName());
         assertNull(getResponseUserDto.getPassword());
+    }
+
+    @Test
+    public void getUsers() throws Exception{
+        List<UserDto> users = new ArrayList<>();
+        List<UserDto> expectedUsers = new ArrayList<>();
+        for(int i = 0 ; i < 4; i++) {
+            users.add(generateUserDto());
+        }
+        users.get(0).setFirstName("RandomQUERY");
+        users.get(1).setLastName("RandomQUERYRandom");
+        users.get(2).setEmail("QUERYRandom@domain.com");
+        for(UserDto userDto : users) {
+            expectedUsers.add(registerUser(userDto));
+        }
+
+        UserDto userDto = users.get(3);
+        MvcResult getResult = mockMvc.perform(get("/user")
+                .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
+                .param("q", "QUERY")
+        ).andExpect(status().isOk()).andReturn();
+        String getResponse = getResult.getResponse().getContentAsString();
+        List<UserDto> getResponseUserDtos= objectMapper.readValue(getResponse, new TypeReference<List<UserDto>>(){});
+        getResponseUserDtos.sort(Comparator.comparingInt(o -> (int) o.getId()));
+
+        for(int i = 0; i < 3; i++) {
+            UserDto expected = expectedUsers.get(i);
+            UserDto received = getResponseUserDtos.get(i);
+
+            assertEquals(expected.getId(), received.getId());
+            assertEquals(expected.getEmail(), received.getEmail());
+            assertEquals(expected.getFirstName(), received.getFirstName());
+            assertEquals(expected.getLastName(), received.getLastName());
+        }
     }
 
     @Test
