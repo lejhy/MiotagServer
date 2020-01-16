@@ -67,6 +67,8 @@ public class UserControllerIntegrationTest {
         UserDto getResponseUserDto = objectMapper.readValue(getResponse, UserDto.class);
 
         assertEquals(postResponseUserDto.getId(), getResponseUserDto.getId());
+        assertEquals(postResponseUserDto.isTherapist(), getResponseUserDto.isTherapist());
+        assertEquals(postResponseUserDto.isPrivate(), getResponseUserDto.isPrivate());
         assertEquals(postResponseUserDto.getEmail(), getResponseUserDto.getEmail());
         assertEquals(postResponseUserDto.getFirstName(), getResponseUserDto.getFirstName());
         assertEquals(postResponseUserDto.getLastName(), getResponseUserDto.getLastName());
@@ -119,6 +121,8 @@ public class UserControllerIntegrationTest {
             UserDto received = getResponseUserDtos.get(i);
 
             assertEquals(expected.getId(), received.getId());
+            assertEquals(expected.isTherapist(), received.isTherapist());
+            assertEquals(expected.isPrivate(), received.isPrivate());
             assertEquals(expected.getEmail(), received.getEmail());
             assertEquals(expected.getFirstName(), received.getFirstName());
             assertEquals(expected.getLastName(), received.getLastName());
@@ -155,6 +159,8 @@ public class UserControllerIntegrationTest {
         UserDto patchResponseUserDto = objectMapper.readValue(patchResponse, UserDto.class);
 
         assertEquals(postResponseUserDto.getId(), patchResponseUserDto.getId());
+        assertEquals(postResponseUserDto.isTherapist(), patchResponseUserDto.isTherapist());
+        assertEquals(postResponseUserDto.isPrivate(), patchResponseUserDto.isPrivate());
         assertEquals(patchUserDto.getEmail(), patchResponseUserDto.getEmail());
         assertEquals(patchUserDto.getFirstName(), patchResponseUserDto.getFirstName());
         assertEquals(patchUserDto.getLastName(), patchResponseUserDto.getLastName());
@@ -182,6 +188,8 @@ public class UserControllerIntegrationTest {
         UserDto getResponseUserDto = objectMapper.readValue(getResponse, UserDto.class);
 
         assertEquals(postResponseUserDto.getId(), getResponseUserDto.getId());
+        assertEquals(postResponseUserDto.isTherapist(), getResponseUserDto.isTherapist());
+        assertEquals(postResponseUserDto.isPrivate(), getResponseUserDto.isPrivate());
         assertEquals(patchUserDto.getEmail(), getResponseUserDto.getEmail());
         assertEquals(patchUserDto.getFirstName(), getResponseUserDto.getFirstName());
         assertEquals(patchUserDto.getLastName(), getResponseUserDto.getLastName());
