@@ -22,6 +22,7 @@ class Utils {
     static UserDto generateUserDto() {
         String uid = Integer.toString(random.nextInt());
         UserDto userDto = new UserDto();
+        userDto.setTherapist(random.nextBoolean());
         userDto.setEmail("user"+uid+"@domain.com");
         userDto.setFirstName("FirstName"+uid);
         userDto.setLastName("LastName"+uid);
