@@ -22,6 +22,7 @@ import java.util.List;
 import static Miotag.controller.Utils.generateUserDto;
 import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,12 +88,7 @@ public class UserControllerIntegrationTest {
         }
 
         UserDto userDto = users.get(3);
-        MvcResult getResult = mockMvc.perform(get("/users")
-                .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
-                .param("q", "QUERY")
-        ).andExpect(status().isOk()).andReturn();
-        String getResponse = getResult.getResponse().getContentAsString();
-        List<UserDto> getResponseUserDtos= objectMapper.readValue(getResponse, new TypeReference<List<UserDto>>(){});
+        List<UserDto> getResponseUserDtos = getUsers(userDto, "QUERY");
         getResponseUserDtos.sort(Comparator.comparingInt(o -> (int) o.getId()));
 
         for(int i = 0; i < 3; i++) {
@@ -104,6 +100,21 @@ public class UserControllerIntegrationTest {
             assertEquals(expected.getFirstName(), received.getFirstName());
             assertEquals(expected.getLastName(), received.getLastName());
         }
+    }
+
+    @Test
+    public void getUsersPrivate() throws Exception{
+        UserDto userDto = generateUserDto();
+        registerUser(userDto);
+
+        UserDto privateUser = generateUserDto();
+        privateUser.setFirstName("QUERY");
+        privateUser.setPrivate(true);
+        registerUser(privateUser);
+
+        List<UserDto> getResponseUserDtos = getUsers(userDto, "QUERY");
+
+        assertEquals(0, getResponseUserDtos.size());
     }
 
     @Test
@@ -161,5 +172,14 @@ public class UserControllerIntegrationTest {
         ).andExpect(status().isOk()).andReturn();
         String postReponse = postResult.getResponse().getContentAsString();
         return objectMapper.readValue(postReponse, UserDto.class);
+    }
+
+    private List<UserDto> getUsers(UserDto userDto, String query) throws Exception {
+        MvcResult getResult = mockMvc.perform(get("/users")
+                .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
+                .param("q", "QUERY")
+        ).andExpect(status().isOk()).andReturn();
+        String getResponse = getResult.getResponse().getContentAsString();
+        return objectMapper.readValue(getResponse, new TypeReference<List<UserDto>>(){});
     }
 }

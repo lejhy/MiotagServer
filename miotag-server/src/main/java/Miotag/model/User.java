@@ -26,6 +26,7 @@ public class User implements UserDetails {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean isTherapist;
+    private boolean isPrivate;
     private String firstName;
     private String lastName;
     private String email;
@@ -111,6 +112,14 @@ public class User implements UserDetails {
 
     public void setTherapist(boolean therapist) {
         isTherapist = therapist;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
 
     public String getFirstName() {

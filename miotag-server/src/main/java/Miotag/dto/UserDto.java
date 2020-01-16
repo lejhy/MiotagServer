@@ -11,6 +11,8 @@ public class UserDto {
 
     private boolean isTherapist;
 
+    private boolean isPrivate;
+
     private String firstName;
 
     private String lastName;
@@ -38,6 +40,14 @@ public class UserDto {
 
     public void setTherapist(boolean therapist) {
         isTherapist = therapist;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
 
     public String getFirstName() {
