@@ -32,7 +32,7 @@ class Utils {
 
     static UserDto registerUser(MockMvc mockMvc, ObjectMapper objectMapper, UserDto user) throws Exception {
         return objectMapper.readValue(
-                mockMvc.perform(post("/user")
+                mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user))
                 ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(),

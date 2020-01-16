@@ -51,7 +51,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void getUser4xx() throws Exception{
-        mockMvc.perform(get("/user")).andExpect(status().is4xxClientError());
+        mockMvc.perform(get("/users")).andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class UserControllerIntegrationTest {
         UserDto userDto = generateUserDto();
         UserDto postResponseUserDto = registerUser(userDto);
 
-        MvcResult getResult = mockMvc.perform(get("/user")
+        MvcResult getResult = mockMvc.perform(get("/users")
                 .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
         ).andExpect(status().isOk()).andReturn();
         String getResponse = getResult.getResponse().getContentAsString();
@@ -87,7 +87,7 @@ public class UserControllerIntegrationTest {
         }
 
         UserDto userDto = users.get(3);
-        MvcResult getResult = mockMvc.perform(get("/user")
+        MvcResult getResult = mockMvc.perform(get("/users")
                 .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
                 .param("q", "QUERY")
         ).andExpect(status().isOk()).andReturn();
@@ -112,7 +112,7 @@ public class UserControllerIntegrationTest {
         UserDto postResponseUserDto = registerUser(userDto);
 
         UserDto patchUserDto = generateUserDto();
-        MvcResult patchResult = mockMvc.perform(patch("/user")
+        MvcResult patchResult = mockMvc.perform(patch("/users")
                 .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(patchUserDto))
@@ -133,7 +133,7 @@ public class UserControllerIntegrationTest {
         UserDto postResponseUserDto = registerUser(userDto);
 
         UserDto patchUserDto = generateUserDto();
-        MvcResult patchResult = mockMvc.perform(patch("/user")
+        MvcResult patchResult = mockMvc.perform(patch("/users")
                 .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(patchUserDto))
@@ -141,7 +141,7 @@ public class UserControllerIntegrationTest {
         String patchResponse = patchResult.getResponse().getContentAsString();
         UserDto patchResponseUserDto = objectMapper.readValue(patchResponse, UserDto.class);
 
-        MvcResult getResult = mockMvc.perform(get("/user")
+        MvcResult getResult = mockMvc.perform(get("/users")
                 .with(httpBasic(patchUserDto.getEmail(), patchUserDto.getPassword()))
         ).andExpect(status().isOk()).andReturn();
         String getResponse = getResult.getResponse().getContentAsString();
@@ -155,7 +155,7 @@ public class UserControllerIntegrationTest {
     }
 
     private UserDto registerUser(UserDto userDto) throws Exception{
-        MvcResult postResult = mockMvc.perform(post("/user")
+        MvcResult postResult = mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDto))
         ).andExpect(status().isOk()).andReturn();
