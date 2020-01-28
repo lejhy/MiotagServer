@@ -114,12 +114,15 @@ public class ActivityControllerIntegrationTest {
         ActivityLogDto activityLogReceived = activityLogsReceived.get(0);
 
         assertEquals(activityLogSent.getId(), activityLogReceived.getId());
-        assertEquals(activityLogToSend.getActivity().getId(), activityLogSent.getActivity().getId(), activityLogReceived.getActivity().getId());
+        assertEquals(activityLogToSend.getActivity().getId(), activityLogSent.getActivity().getId());
+        assertEquals(activityLogSent.getActivity().getId(), activityLogReceived.getActivity().getId());
         assertTrue(timestampBefore.compareTo(activityLogSent.getDate()) <= 0);
         assertTrue(timestampAfter.compareTo(activityLogSent.getDate()) >= 0);
         assertEquals(activityLogSent.getDate(), activityLogReceived.getDate());
-        assertEquals(activityLogToSend.getScore(), activityLogSent.getScore(), activityLogReceived.getScore());
-        assertEquals(activityLogToSend.getLength(), activityLogSent.getLength(), activityLogReceived.getLength());
+        assertEquals(activityLogToSend.getScore(), activityLogSent.getScore());
+        assertEquals(activityLogSent.getScore(), activityLogReceived.getScore());
+        assertEquals(activityLogToSend.getLength(), activityLogSent.getLength());
+        assertEquals(activityLogSent.getLength(), activityLogReceived.getLength());
     }
 
     @Test
