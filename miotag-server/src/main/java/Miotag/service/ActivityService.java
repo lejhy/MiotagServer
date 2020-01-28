@@ -2,7 +2,9 @@ package Miotag.service;
 
 import Miotag.dto.ActivityDto;
 import Miotag.dto.ActivityLogDto;
+import Miotag.dto.UserDto;
 import Miotag.exception.ActivityNotFoundException;
+import Miotag.exception.PrivateDataException;
 import Miotag.mapper.ActivityLogMapper;
 import Miotag.mapper.ActivityMapper;
 import Miotag.model.Activity;
@@ -24,13 +26,15 @@ public class ActivityService implements IActivityService {
     private final ActivityLogRepository activityLogRepository;
     private final ActivityMapper activityMapper;
     private final ActivityLogMapper activityLogMapper;
+    private final IUserService userService;
 
     @Autowired
-    public ActivityService(ActivityRepository activityRepository, ActivityLogRepository activityLogRepository, ActivityMapper activityMapper, ActivityLogMapper activityLogMapper) {
+    public ActivityService(ActivityRepository activityRepository, ActivityLogRepository activityLogRepository, ActivityMapper activityMapper, ActivityLogMapper activityLogMapper, IUserService userService) {
         this.activityRepository = activityRepository;
         this.activityLogRepository = activityLogRepository;
         this.activityMapper = activityMapper;
         this.activityLogMapper = activityLogMapper;
+        this.userService = userService;
     }
 
     @Override
@@ -58,10 +62,36 @@ public class ActivityService implements IActivityService {
 
     @Override
     public List<ActivityLogDto> getActivityLogs(User user, long activityId) {
-        Activity activity = new Activity();
-        activity.setId(activityId);
-        List<ActivityLog> activityLogs = activityLogRepository.findAllByUserAndActivity(user, activity);
+        if(!activityRepository.existsById(activityId)) {
+            throw new ActivityNotFoundException(activityId);
+        }
+        List<ActivityLog> activityLogs = activityLogRepository.findAllByUserAndActivityId(user, activityId);
         return activityLogs.stream().map(activityLogMapper::map).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ActivityLogDto> getActivityLogs(long id) {
+        UserDto userDto = userService.getUser(id);
+        if (userDto.isPrivate()) {
+            throw new PrivateDataException(id);
+        } else {
+            List<ActivityLog> activityLogs = activityLogRepository.findAllByUserId(id);
+            return activityLogs.stream().map(activityLogMapper::map).collect(Collectors.toList());
+        }
+    }
+
+    @Override
+    public List<ActivityLogDto> getActivityLogs(long id, long activityId) {
+        UserDto userDto = userService.getUser(id);
+        if (userDto.isPrivate()) {
+            throw new PrivateDataException(id);
+        } else {
+            if(!activityRepository.existsById(activityId)) {
+                throw new ActivityNotFoundException(activityId);
+            }
+            List<ActivityLog> activityLogs = activityLogRepository.findAllByUserIdAndActivityId(id, activityId);
+            return activityLogs.stream().map(activityLogMapper::map).collect(Collectors.toList());
+        }
     }
 
     private ActivityLog prepareNewActivityLog(ActivityLogDto activityLogDto, User user) {

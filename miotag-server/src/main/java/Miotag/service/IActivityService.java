@@ -10,5 +10,7 @@ public interface IActivityService {
     List<ActivityDto> getActivities(User user);
     ActivityLogDto newActivityLog(ActivityLogDto activityLogDto, User user);
     List<ActivityLogDto> getActivityLogs(User user);
+    List<ActivityLogDto> getActivityLogs(long id);
     List<ActivityLogDto> getActivityLogs(User user, long activityId);
+    List<ActivityLogDto> getActivityLogs(long id, long activityId);
 }

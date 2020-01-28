@@ -3,17 +3,14 @@ package Miotag.controller;
 import Miotag.dto.ActivityDto;
 import Miotag.dto.ActivityLogDto;
 import Miotag.exception.ValidationErrorException;
-import Miotag.model.Activity;
 import Miotag.model.User;
 import Miotag.service.IActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -44,5 +41,15 @@ public class ActivityController {
     @GetMapping("/logs/{activityId}")
     public List<ActivityLogDto> getActivityLogs(@PathVariable("activityId") long activityId, @AuthenticationPrincipal User user) {
         return activityService.getActivityLogs(user, activityId);
+    }
+
+    @GetMapping("/{id}/logs")
+    public List<ActivityLogDto> getActivityLogs(@PathVariable("id") long id) {
+        return activityService.getActivityLogs(id);
+    }
+
+    @GetMapping("/{id}/logs/{activityId}")
+    public List<ActivityLogDto> getActivityLogs(@PathVariable("id") long id, @PathVariable("activityId") long activityId) {
+        return activityService.getActivityLogs(id, activityId);
     }
 }
