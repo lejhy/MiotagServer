@@ -108,7 +108,7 @@ public class ActivityControllerIntegrationTest {
         Date timestampBefore = new Date();
         ActivityLogDto activityLogSent = postActivityLog(userUnderTest, activityLogToSend);
         Date timestampAfter = new Date();
-        List<ActivityLogDto> activityLogsReceived = getActivityLog(userUnderTest, activityDto);
+        List<ActivityLogDto> activityLogsReceived = getActivityLog(userUnderTest, null, activityDto);
 
         assertEquals(1, activityLogsReceived.size());
         ActivityLogDto activityLogReceived = activityLogsReceived.get(0);
@@ -130,23 +130,16 @@ public class ActivityControllerIntegrationTest {
             activityLogsSent.add(postActivityLog(userUnderTest, generateActivityLogDto(activityDto)));
         }
 
-        List<ActivityLogDto> activityLogsReceived = getActivityLog(userUnderTest, activityDto);
+        List<ActivityLogDto> activityLogsReceived = getActivityLog(userUnderTest, null, activityDto);
         activityLogsReceived.sort(Comparator.comparingLong(ActivityLogDto::getId));
         for(int i = 0; i < activityLogsSent.size(); i++) {
-            ActivityLogDto expectedActivityLog = activityLogsSent.get(i);
-            ActivityLogDto receivedActivityLog = activityLogsReceived.get(i);
-
-            assertEquals(expectedActivityLog.getId(), receivedActivityLog.getId());
-            assertEquals(expectedActivityLog.getActivity().getId(), receivedActivityLog.getActivity().getId());
-            assertEquals(expectedActivityLog.getDate(), receivedActivityLog.getDate());
-            assertEquals(expectedActivityLog.getScore(), receivedActivityLog.getScore());
-            assertEquals(expectedActivityLog.getLength(), receivedActivityLog.getLength());
+            assertActivityLogEquality(activityLogsSent.get(i), activityLogsReceived.get(i));
         }
     }
 
     @Test
     public void getActivityLogEmpty() throws Exception {
-        List<ActivityLogDto> activityLogsReceived = getActivityLog(userUnderTest, activityDto);
+        List<ActivityLogDto> activityLogsReceived = getActivityLog(userUnderTest, null, activityDto);
 
         assertEquals(0, activityLogsReceived.size());
     }
@@ -163,6 +156,51 @@ public class ActivityControllerIntegrationTest {
         ).andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void getActivityLogsOfAnotherUser() throws Exception {
+        UserDto otherUser = generateUserDto();
+        otherUser.setId(registerUser(mockMvc, objectMapper, otherUser).getId());
+
+        List<ActivityLogDto> activityLogsSent = new ArrayList<>();
+
+        for(int i = 0; i < 5; i++) {
+            activityLogsSent.add(postActivityLog(otherUser, generateActivityLogDto(activityDto)));
+        }
+
+        List<ActivityLogDto> activityLogsReceived = getActivityLog(userUnderTest, otherUser.getId(), activityDto);
+        activityLogsReceived.sort(Comparator.comparingLong(ActivityLogDto::getId));
+        for(int i = 0; i < activityLogsSent.size(); i++) {
+            assertActivityLogEquality(activityLogsSent.get(i), activityLogsReceived.get(i));
+        }
+    }
+
+    @Test
+    public void getActivityLogsEmptyOfAnotherUser() throws Exception {
+        UserDto otherUser = generateUserDto();
+        otherUser.setId(registerUser(mockMvc, objectMapper, otherUser).getId());
+        List<ActivityLogDto> activityLogsReceived = getActivityLog(userUnderTest, otherUser.getId(), activityDto);
+
+        assertEquals(0, activityLogsReceived.size());
+    }
+
+    @Test
+    public void getActivityLogsEmptyOfAnotherUserPrivate() throws Exception {
+        UserDto otherUser = generateUserDto();
+        otherUser.setPrivate(true);
+        otherUser.setId(registerUser(mockMvc, objectMapper, otherUser).getId());
+        mockMvc.perform(get("/activities/" + otherUser.getId() + "/logs")
+                .with(httpBasic(userUnderTest.getEmail(), userUnderTest.getPassword()))
+        ).andExpect(status().isForbidden());
+    }
+
+    private void assertActivityLogEquality(ActivityLogDto expectedActivityLog, ActivityLogDto receivedActivityLog) {
+        assertEquals(expectedActivityLog.getId(), receivedActivityLog.getId());
+        assertEquals(expectedActivityLog.getActivity().getId(), receivedActivityLog.getActivity().getId());
+        assertEquals(expectedActivityLog.getDate(), receivedActivityLog.getDate());
+        assertEquals(expectedActivityLog.getScore(), receivedActivityLog.getScore());
+        assertEquals(expectedActivityLog.getLength(), receivedActivityLog.getLength());
+    }
+
     private ActivityLogDto postActivityLog(UserDto userDto, ActivityLogDto activityLogDto) throws Exception {
         MvcResult response = mockMvc.perform(post("/activities/logs")
                 .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
@@ -172,8 +210,8 @@ public class ActivityControllerIntegrationTest {
         return objectMapper.readValue(response.getResponse().getContentAsString(), ActivityLogDto.class);
     }
 
-    private List<ActivityLogDto> getActivityLog(UserDto userDto, ActivityDto activityDto) throws Exception {
-        MvcResult response = mockMvc.perform(get("/activities/logs" + (activityDto == null ? "" : "/"+activityDto.getId()))
+    private List<ActivityLogDto> getActivityLog(UserDto userDto, Long userId, ActivityDto activityDto) throws Exception {
+        MvcResult response = mockMvc.perform(get("/activities" + (userId == null ? "" : "/"+userId) + "/logs" + (activityDto == null ? "" : "/"+activityDto.getId()))
                 .with(httpBasic(userDto.getEmail(), userDto.getPassword()))
         ).andExpect(status().isOk()).andReturn();
         return objectMapper.readValue(response.getResponse().getContentAsString(), new TypeReference<List<ActivityLogDto>>(){});
