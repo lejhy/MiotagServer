@@ -117,19 +117,17 @@ public class RelationControllerIntegrationTest {
     }
 
     private void postRelations(UserDto user, UserDto target, boolean expected) throws Exception{
-        MvcResult response = mockMvc.perform(post("/relations")
+        MvcResult response = mockMvc.perform(post("/relations/" + + target.getId())
                 .with(httpBasic(user.getEmail(), user.getPassword()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(target))
         ).andExpect(status().isOk()).andReturn();
         assertEquals(expected, objectMapper.readValue(response.getResponse().getContentAsString(), boolean.class));
     }
 
     private void deleteRelations(UserDto user, UserDto target, boolean expected) throws Exception {
-        MvcResult response = mockMvc.perform(delete("/relations")
+        MvcResult response = mockMvc.perform(delete("/relations/" + target.getId())
                 .with(httpBasic(user.getEmail(), user.getPassword()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(target))
         ).andExpect(status().isOk()).andReturn();
         assertEquals(expected, objectMapper.readValue(response.getResponse().getContentAsString(), boolean.class));
     }
