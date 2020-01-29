@@ -14,6 +14,7 @@ public class Message {
     private User to;
     private Date date;
     private String subject;
+    @Lob
     private String content;
 
     public long getId() {
