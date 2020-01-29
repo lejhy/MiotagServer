@@ -85,13 +85,13 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
-    public boolean followUser(User user, UserDto userDto) {
+    public boolean followUser(User user, long targetId) {
         user = getAtachedUserEntity(user);
-        if (user.getId() == userDto.getId()) {
+        if (user.getId() == targetId) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User cannot follow itself");
         }
-        User target = userRepository.findById(userDto.getId()).orElseThrow(() ->
-                new UserNotFoundException(userDto.getId())
+        User target = userRepository.findById(targetId).orElseThrow(() ->
+                new UserNotFoundException(targetId)
         );
         if(user.getUsersFollowed().add(target)) {
             Alert alert = new Alert();
@@ -106,13 +106,13 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
-    public boolean unfollowUser(User user, UserDto userDto) {
+    public boolean unfollowUser(User user, long targetId) {
         user = getAtachedUserEntity(user);
-        if (user.getId() == userDto.getId()) {
+        if (user.getId() == targetId) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User cannot unfollow itself");
         }
-        User target = userRepository.findById(userDto.getId()).orElseThrow(() ->
-                new UserNotFoundException(userDto.getId())
+        User target = userRepository.findById(targetId).orElseThrow(() ->
+                new UserNotFoundException(targetId)
         );
         return user.getUsersFollowed().remove(target);
     }

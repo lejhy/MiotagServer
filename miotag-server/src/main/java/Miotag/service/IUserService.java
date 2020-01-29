@@ -17,6 +17,6 @@ public interface IUserService {
 
     UserDto updateUser(User user, UserDto userDto);
     List<UserDto> getUsersFollowed(User user);
-    boolean followUser(User user, UserDto userDto);
-    boolean unfollowUser(User user, UserDto userDto);
+    boolean followUser(User user, long targetId);
+    boolean unfollowUser(User user, long targetId);
 }

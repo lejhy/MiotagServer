@@ -27,19 +27,13 @@ public class RelationController {
         return userService.getUsersFollowed(user);
     }
 
-    @PostMapping
-    public boolean follow(@RequestBody UserDto userDto, @AuthenticationPrincipal User user) {
-        if (userDto.getId() == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please provide the target user id");
-        }
-        return userService.followUser(user, userDto);
+    @PostMapping("/{id}")
+    public boolean follow(@PathVariable("id") long targetId, @AuthenticationPrincipal User user) {
+        return userService.followUser(user, targetId);
     }
 
-    @DeleteMapping
-    public boolean unfollow(@RequestBody UserDto userDto, @AuthenticationPrincipal User user) {
-        if (userDto.getId() == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please provide the target user id");
-        }
-        return userService.unfollowUser(user, userDto);
+    @DeleteMapping("/{id}")
+    public boolean unfollow(@PathVariable("id") long targetId, @AuthenticationPrincipal User user) {
+        return userService.unfollowUser(user, targetId);
     }
 }
