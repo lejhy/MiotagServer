@@ -159,8 +159,8 @@ public class UserControllerIntegrationTest {
         UserDto patchResponseUserDto = objectMapper.readValue(patchResponse, UserDto.class);
 
         assertEquals(postResponseUserDto.getId(), patchResponseUserDto.getId());
-        assertEquals(postResponseUserDto.isTherapist(), patchResponseUserDto.isTherapist());
-        assertEquals(postResponseUserDto.isPrivate(), patchResponseUserDto.isPrivate());
+        assertEquals(patchUserDto.isTherapist(), patchResponseUserDto.isTherapist());
+        assertEquals(patchUserDto.isPrivate(), patchResponseUserDto.isPrivate());
         assertEquals(patchUserDto.getEmail(), patchResponseUserDto.getEmail());
         assertEquals(patchUserDto.getFirstName(), patchResponseUserDto.getFirstName());
         assertEquals(patchUserDto.getLastName(), patchResponseUserDto.getLastName());
