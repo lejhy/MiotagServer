@@ -12,6 +12,7 @@ public class Alert {
     private User user;
     private Date date;
     private String message;
+    private boolean isRead;
 
     public long getId() {
         return id;
@@ -43,5 +44,13 @@ public class Alert {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
     }
 }

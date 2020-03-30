@@ -10,6 +10,7 @@ import Miotag.repository.AlertRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,13 +42,32 @@ public class AlertService implements IAlertService {
 
     @Override
     public boolean deleteAlert(User user, AlertDto alertDto) {
-        Alert alertInDb = alertRepository.findById(alertDto.getId()).orElseThrow(() ->
-                new AlertNotFoundException(alertDto.getId())
-        );
-        if (user.getId() != alertInDb.getId()) {
+        Alert alert = getAttachedAlertEntity(user, alertDto.getId());
+        alertRepository.deleteById(alert.getId());
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public AlertDto markAlertAsRead(User user, long alertId) {
+        Alert alert = getAttachedAlertEntity(user, alertId);
+        alert.setRead(true);
+        return alertMapper.map(alert);
+    }
+
+    @Override
+    @Transactional
+    public List<AlertDto> markAllAlertsAsRead(User user) {
+        List<Alert> alerts = alertRepository.findAllByUser(user);
+        alerts.forEach((alert) -> alert.setRead(true));
+        return alerts.stream().map(alertMapper::map).collect(Collectors.toList());
+    }
+
+    private Alert getAttachedAlertEntity(User user, long alertId) {
+        Alert alert = alertRepository.findById(alertId).orElseThrow(() -> new AlertNotFoundException(alertId));
+        if (user.getId() != alert.getUser().getId()) {
             throw new AccessViolationException();
         }
-        alertRepository.deleteById(alertDto.getId());
-        return true;
+        return alert;
     }
 }

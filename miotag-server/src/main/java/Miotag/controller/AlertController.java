@@ -35,4 +35,14 @@ public class AlertController {
         }
         return alertService.deleteAlert(user, alertDto);
     }
+
+    @PostMapping("/read/{id}")
+    public AlertDto markAlertAsRead(@PathVariable("id") long alertId, @AuthenticationPrincipal User user) {
+        return alertService.markAlertAsRead(user, alertId);
+    }
+
+    @PostMapping("/read/all")
+    public List<AlertDto> markAllAlertsAsRead(@AuthenticationPrincipal User user) {
+        return alertService.markAllAlertsAsRead(user);
+    }
 }

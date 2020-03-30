@@ -9,6 +9,7 @@ public class AlertDto {
     private UserDto user;
     private Date date;
     private String message;
+    private boolean isRead;
 
     public long getId() {
         return id;
@@ -40,5 +41,13 @@ public class AlertDto {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
     }
 }

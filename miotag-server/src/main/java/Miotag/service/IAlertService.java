@@ -10,4 +10,6 @@ public interface IAlertService {
     Alert newAlert(Alert alert);
     List<AlertDto> getAlerts(User user);
     boolean deleteAlert(User user, AlertDto alertDto);
+    AlertDto markAlertAsRead(User user, long alertId);
+    List<AlertDto> markAllAlertsAsRead(User user);
 }
